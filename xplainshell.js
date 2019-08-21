@@ -4,7 +4,7 @@ const telegramBot = require('node-telegram-bot-api'),
       dotenv      = require('dotenv').config(),
       request     = require('superagent'),
       cheerio     = require('cheerio'),
-      token       = process.env.TELEGRAM_API,
+      token       = process.env.722773978:AAGueeFmkBawsU15du0KoD6yGQQaFm3nXtU,
       bot         = new telegramBot(token, {webHook: { port: process.env.PORT }});
 
 const url = process.env.APP_URL || 'https://xplainshell-bot.herokuapp.com';
