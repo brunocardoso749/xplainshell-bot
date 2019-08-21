@@ -1,31 +1,17 @@
-"use strict";
+var restify = require('restify');
+var builder = require('botbuilder');
 
-const telegramBot = require('node-telegram-bot-api'),
-      dotenv      = require('dotenv').config(),
-      request     = require('superagent'),
-      cheerio     = require('cheerio'),
-      token       = process.env.TELEGRAM_API,
-      bot         = new telegramBot(token, {webHook: { port: process.env.PORT }});
+var server = restify.createServer();
+server.listen(process.env.port || process.env.PORT || 3978, function () {
+    console.log('%s listening to %s', server.name, server.url);
+});
 
-const url = process.env.APP_URL || 'https://xplainshell-bot.herokuapp.com';
+var connector = new builder.ChatConnector({
+    appId: process.env.MICROSOFT_APP_ID,
+    appPassword: process.env.MICROSOFT_APP_PASSWORD
+});
 
-// Isso faz setup do webhook nos servidores do telegram
-bot.setWebHook(`${url}/bot${token}`);
-
-bot.on('message', (msg) => {
-  let userID      = msg.chat.id,
-      messageUser = msg.text,
-      url         = 'https:\/\/explainshell.com/explain?cmd='+ messageUser;
-
-  request.get(url, (err, res) => {
-    if (err) throw err;
-
-    let $             = cheerio.load(res.text),
-        answer        = $('.help-box').text(),
-        errorMessage  = "Sorry, this command is invalid or unknown. Try another command.";
-
-    bot.sendMessage(userID, answer).catch((error) => {
-      bot.sendMessage(userID, errorMessage);
-    });
-  });
+server.post('/api/messages', connector.listen());
+var bot = new builder.UniversalBot(connector, function (session) {
+    session.send("Você disse: %s", session.message.text);
 });
